@@ -8,7 +8,8 @@ jobs:
   review-code:
     if: >
       github.event.requested_reviewer.login == 'ai-agent-net' && 
-      github.actor.login == github.repository_owner.login
+      github.actor.login == github.event.repository.owner.login
+      
     runs-on: ubuntu-latest
 
     permissions:
