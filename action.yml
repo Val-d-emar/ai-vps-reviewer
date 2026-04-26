@@ -30,7 +30,7 @@ inputs:
   comment_title:
     description: "Title for the comment"
     required: false
-    default: "# 🤖 VPS AI Code Review"
+    default: "# 🤖 AI Code Review"
 
 runs:
   using: "composite"
