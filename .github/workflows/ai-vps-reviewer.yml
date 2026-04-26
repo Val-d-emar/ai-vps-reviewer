@@ -8,7 +8,7 @@ jobs:
   review-code:
     if: >
       github.event.requested_reviewer.login == 'ai-agent-net' && 
-      github.actor.login == github.repository_owner.login
+      github.actor == github.repository_owner
     runs-on: ubuntu-latest
 
     permissions:
@@ -16,9 +16,8 @@ jobs:
       pull-requests: write
 
     env:
-      GITHUB_ACTOR_LOGIN: ${{ github.actor.login }}
+      GITHUB_ACTOR_LOGIN: ${{ github.actor }}
       GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
-      GITHUB_REPOSITORY_OWNER_LOGIN: ${{ github.repository_owner.login }}
 
     steps:
       - name: Test Gemini Review
