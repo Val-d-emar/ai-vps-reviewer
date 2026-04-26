@@ -7,6 +7,9 @@ inputs:
   vps_target:
     description: "SSH target (user@host)"
     required: true
+  vps_users:
+    description: "VPS users list (comma separated)"
+    required: true
   agent_model:
     description: "Gemini model"
     required: false
@@ -33,8 +36,19 @@ inputs:
     default: "# 🤖 AI Code Review"
 
 runs:
+
   using: "composite"
   steps:
+    - name: Validate Access
+      shell: bash
+      run: |
+        ALLOWED_USERS="${{ inputs.vps_users }}"
+        ACTOR="${{ github.actor }}"
+        if [[ ! ",$ALLOWED_USERS," =~ ",$ACTOR," ]]; then
+          echo "Error: User $ACTOR is not in the allowed list: $ALLOWED_USERS"
+          exit 1
+        fi
+
     - name: Checkout Code
       uses: actions/checkout@v6
       with:
