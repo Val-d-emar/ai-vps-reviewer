@@ -1,0 +1,123 @@
+name: "AI VPS Reviewer"
+description: "AI code review via remote VPS"
+inputs:
+  vps_ssh_key:
+    description: "Private SSH key to access VPS"
+    required: true
+  vps_target:
+    description: "SSH target (user@host)"
+    required: true
+  agent_model:
+    description: "Gemini model"
+    required: false
+    default: "flash"
+  github_token:
+    description: "GitHub PAT"
+    required: false
+    default: ${{ github.token }}
+  review_prompt:
+    description: "Custom prompt for the AI"
+    required: false
+    default: "You are an expert software engineer. Review this git diff for bugs, security, and style."
+  review_language:
+    description: "Language for the AI"
+    required: false
+    default: "English"
+  approval_required:
+    description: "Require approval"
+    required: false
+    default: "false"
+  comment_title:
+    description: "Title for the comment"
+    required: false
+    default: "# 🤖 VPS AI Code Review"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+        token: ${{ inputs.github_token }}
+
+    - name: Generate PR Diff
+      id: diff
+      shell: bash
+      run: |
+        if [ -z "${{ github.event.pull_request.number }}" ]; then
+          echo "Error: This action only works on pull_request events."
+          exit 1
+        fi
+        BASE_SHA="${{ github.event.pull_request.base.sha }}"
+        HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+        git diff $BASE_SHA...$HEAD_SHA > pr_diff.txt
+
+        if [ ! -s pr_diff.txt ]; then
+          echo "skip=true" >> $GITHUB_OUTPUT
+        else
+          echo "skip=false" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Run Gemini Review on VPS
+      if: steps.diff.outputs.skip == 'false'
+      shell: bash
+      env:
+        SSH_KEY: ${{ inputs.vps_ssh_key }}
+        SSH_TARGET: ${{ inputs.vps_target }}
+      run: |
+        # 1. SSH Agent
+        eval $(ssh-agent -s)
+        echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null 2>&1
+
+        # 2. Подготовка аргументов
+        PR_NUM="${{ github.event.pull_request.number }}"
+        REPO="${{ github.repository }}"
+        LANG="${{ inputs.review_language }}"
+        PROMPT="${{ inputs.review_prompt }}"
+        MODEL="${{ inputs.agent_model }}"
+
+        # Используем printf %q для безопасного экранирования всех аргументов для удаленного шелла
+        REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG" "$PROMPT" "$MODEL")
+
+        # 3. Вызов VPS
+        cat pr_diff.txt | ssh -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
+
+        ssh-agent -k > /dev/null 2>&1
+
+        # 4. Формируем результат
+        printf "%s\n\n" "${{ inputs.comment_title }}" > review_result.md
+        cat raw_review.md >> review_result.md
+
+        # 5. Логика Approve
+        if [ "${{ inputs.approval_required }}" == "true" ]; then
+          grep -iq "RESUME: APPROVE" review_result.md && echo "APPROVE" > review_status.txt || echo "REJECT" > review_status.txt
+        fi
+
+    - name: Submit Feedback to PR
+      if: steps.diff.outputs.skip == 'false'
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+      run: |
+        CURRENT_USER=$(gh api user -q .login 2>/dev/null || echo "github-actions[bot]")
+        if [[ "$CURRENT_USER" == *"{"* ]]; then CURRENT_USER="github-actions[bot]"; fi
+
+        if [ "${{ inputs.approval_required }}" == "true" ]; then
+          RESUME=$(cat review_status.txt 2>/dev/null || echo "REJECT")
+          if [ "$RESUME" == "APPROVE" ]; then
+            gh pr review ${{ github.event.pull_request.number }} -R ${{ github.repository }} --approve --body-file review_result.md
+          else
+            gh pr review ${{ github.event.pull_request.number }} -R ${{ github.repository }} --request-changes --body-file review_result.md
+          fi
+        else
+          COMMENT_ID=$(gh api --paginate repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments | \
+            jq -r --arg u "$CURRENT_USER" --arg t "${{ inputs.comment_title }}" \
+            '.[] | select(.user.login == $u and (.body | startswith($t))) | .id' | tail -1)
+          
+          if [ -n "$COMMENT_ID" ] && [ "$COMMENT_ID" != "null" ]; then
+            gh api --method PATCH /repos/${{ github.repository }}/issues/comments/$COMMENT_ID -F body=@review_result.md
+          else
+            gh pr comment ${{ github.event.pull_request.number }} -R ${{ github.repository }} --body-file review_result.md
+          fi
+        fi
