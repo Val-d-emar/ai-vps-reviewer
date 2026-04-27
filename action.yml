@@ -10,7 +10,7 @@ inputs:
   vps_users:
     description: "VPS users list (comma separated)"
     required: false
-    default: github.repository_owner
+    default: undefined
   agent_model:
     description: "Gemini model"
     required: false
@@ -41,6 +41,7 @@ runs:
   using: "composite"
   steps:
     - name: Validate Access
+      id: validate
       shell: bash
       run: |
         ALLOWED_USERS="${{ inputs.vps_users }}"
