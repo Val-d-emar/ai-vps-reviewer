@@ -10,7 +10,7 @@ inputs:
   vps_users:
     description: "VPS users list (comma separated)"
     required: false
-    default: undefined
+    default: ""
   agent_model:
     description: "Gemini model"
     required: false
@@ -42,12 +42,14 @@ runs:
   steps:
     - name: Validate Access
       id: validate
+      env:
+        ALLOWED_USERS: ${{ inputs.vps_users }}
+        ACTOR: ${{ github.actor }}
       shell: bash
       run: |
-        ALLOWED_USERS="${{ inputs.vps_users }}"
-        ACTOR="${{ github.actor }}"
-        if [[ ! ",$ALLOWED_USERS," =~ ",$ACTOR," ]]; then
-          echo "Error: User $ACTOR is not in the allowed list: $ALLOWED_USERS"
+        TRIMMED_USERS=`echo "$ALLOWED_USERS" | tr -d ' '`
+        if [[ ! ",$TRIMMED_USERS," =~ ",$ACTOR," ]]; then
+          echo "Error: User $ACTOR not finded in the allowed list: $ALLOWED_USERS"
           exit 1
         fi
 
