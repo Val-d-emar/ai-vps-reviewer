@@ -7,6 +7,10 @@ inputs:
   vps_target:
     description: "SSH target (user@host)"
     required: true
+  vps_users:
+    description: "VPS users list (comma separated)"
+    required: false
+    default: ""
   agent_model:
     description: "Gemini model"
     required: false
@@ -18,7 +22,12 @@ inputs:
   review_prompt:
     description: "Custom prompt for the AI"
     required: false
-    default: "You are an expert software engineer. Review this git diff for bugs, security, and style."
+    default: >
+      You are an expert software engineer. Review this git diff for bugs, security, and style. 
+      Provide feedback in Markdown. 
+      IMPORTANT: Assume all infrastructure versions (like GitHub Actions @v4, @v6, etc.) are valid and exist; do not flag them as incorrect. 
+      Focus strictly on the logic, security, and quality of the code changes.
+      If okay, approve PR including the text 'RESUME: APPROVE' to end of your response.
   review_language:
     description: "Language for the AI"
     required: false
@@ -33,8 +42,22 @@ inputs:
     default: "# 🤖 AI Code Review"
 
 runs:
+
   using: "composite"
   steps:
+    - name: Validate Access
+      id: validate
+      env:
+        ALLOWED_USERS: ${{ inputs.vps_users }}
+        ACTOR: ${{ github.actor }}
+      shell: bash
+      run: |
+        TRIMMED_USERS=$(echo "$ALLOWED_USERS" | tr -d ' ')
+        if [[ ! ",$TRIMMED_USERS," =~ ",$ACTOR," ]]; then
+          echo "Error: User $ACTOR not found in the allowed list: $ALLOWED_USERS"
+          exit 1
+        fi
+
     - name: Checkout Code
       uses: actions/checkout@v6
       with:
@@ -81,7 +104,7 @@ runs:
         REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG" "$PROMPT" "$MODEL")
 
         # 3. Вызов VPS
-        cat pr_diff.txt | ssh -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
+        cat pr_diff.txt | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
 
         ssh-agent -k > /dev/null 2>&1
 

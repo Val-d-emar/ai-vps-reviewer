@@ -7,8 +7,7 @@ on:
 jobs:
   review-code:
     if: >
-      github.event.requested_reviewer.login == 'ai-agent-net' && 
-      github.actor.login == github.repository_owner
+      github.event.requested_reviewer.login == 'ai-agent-net'
     runs-on: ubuntu-latest
 
     permissions:
@@ -17,11 +16,13 @@ jobs:
 
     steps:
       - name: Test Gemini Review
-        uses: Val-d-emar/ai-vps-reviewer@main
+        uses: Val-d-emar/ai-vps-reviewer@dev
         with:
           github_token: ${{ secrets.AI_AGENT_PAT }}
           vps_ssh_key: ${{ secrets.VPS_SSH_KEY }}
           vps_target: ${{ secrets.VPS_TARGET }}
+          vps_users: ${{ vars.ALLOWED_USERS || github.repository_owner }}
+          agent_model: "flash"
           review_language: "Russian"
-          approval_required: false
+          approval_required: true
           comment_title: "# 🤖 Gemini AI Code Review"
