@@ -22,7 +22,12 @@ inputs:
   review_prompt:
     description: "Custom prompt for the AI"
     required: false
-    default: "You are an expert software engineer. Review this git diff for bugs, security, and style."
+    default: >
+      You are an expert software engineer. Review this git diff for bugs, security, and style. 
+      Provide feedback in Markdown. 
+      IMPORTANT: Assume all infrastructure versions (like GitHub Actions @v4, @v6, etc.) are valid and exist; do not flag them as incorrect. 
+      Focus strictly on the logic, security, and quality of the code changes.
+      If okay, approve PR including the text 'RESUME: APPROVE' to end of your response.
   review_language:
     description: "Language for the AI"
     required: false
