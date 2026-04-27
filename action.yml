@@ -47,7 +47,7 @@ runs:
         ACTOR: ${{ github.actor }}
       shell: bash
       run: |
-        TRIMMED_USERS=`echo "$ALLOWED_USERS" | tr -d ' '`
+        TRIMMED_USERS=$(echo "$ALLOWED_USERS" | tr -d ' ')
         if [[ ! ",$TRIMMED_USERS," =~ ",$ACTOR," ]]; then
           echo "Error: User $ACTOR not finded in the allowed list: $ALLOWED_USERS"
           exit 1
@@ -99,7 +99,7 @@ runs:
         REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG" "$PROMPT" "$MODEL")
 
         # 3. Вызов VPS
-        cat pr_diff.txt | ssh -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
+        cat pr_diff.txt | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
 
         ssh-agent -k > /dev/null 2>&1
 
