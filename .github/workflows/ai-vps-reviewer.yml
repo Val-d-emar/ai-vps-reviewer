@@ -24,5 +24,5 @@ jobs:
           vps_users: ${{ vars.ALLOWED_USERS || github.repository_owner }}
           agent_model: "flash"
           review_language: "Russian"
-          approval_required: false
+          approval_required: true
           comment_title: "# 🤖 Gemini AI Code Review"
