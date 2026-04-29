@@ -51,7 +51,21 @@ runs:
 
   using: "composite"
   steps:
+    - name: Cleanup VPS Workspace on Close
+      if: github.event.action == 'closed'
+      env:
+        SSH_KEY: ${{ inputs.vps_ssh_key }}
+        SSH_TARGET: ${{ inputs.vps_target }}
+      shell: bash
+      run: |
+        eval $(ssh-agent -s)
+        echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null 2>&1
+        # Если PR закрыт, удаляем папку этого PR
+        ssh -o StrictHostKeyChecking=no $SSH_TARGET "rm -rf ~/src/${{ github.repository }}/pr_${{ github.event.pull_request.number }}"
+        ssh-agent -k > /dev/null 2>&1
+
     - name: Validate Access
+      if: github.event.action != 'closed'
       id: validate
       env:
         ALLOWED_USERS: ${{ inputs.vps_users }}
@@ -65,6 +79,8 @@ runs:
         fi
 
     - name: Checkout Code
+      id: checkout
+      if: steps.validate.outcome == 'success'
       uses: actions/checkout@v6
       with:
         fetch-depth: 0
@@ -72,6 +88,7 @@ runs:
 
     - name: Generate PR Diff
       id: diff
+      if: steps.checkout.outcome == 'success'
       shell: bash
       run: |
         if [ -z "${{ github.event.pull_request.number }}" ]; then
@@ -89,7 +106,8 @@ runs:
         fi
 
     - name: Run Gemini Review on VPS
-      if: steps.diff.outputs.skip == 'false'
+      id: review
+      if: steps.diff.outcome == 'success' && steps.diff.outputs.skip == 'false'
       shell: bash
       env:
         SSH_KEY: ${{ inputs.vps_ssh_key }}
@@ -129,7 +147,7 @@ runs:
         fi
 
     - name: Submit Feedback to PR
-      if: steps.diff.outputs.skip == 'false'
+      if: steps.review.outcome == 'success' && steps.diff.outputs.skip == 'false'
       shell: bash
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
