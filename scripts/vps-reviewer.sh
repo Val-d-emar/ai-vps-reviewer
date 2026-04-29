@@ -2,6 +2,7 @@
 # Скрипт-приемник на VPS
 export TERM=xterm-256color
 export COLORTERM=truecolor
+export GIT_PAGER=cat
 
 # 1. Читаем аргументы
 read -r PR_NUMBER REPO_NAME LANG_B64 MODEL_B64 PROMPT_B64 <<< "$SSH_ORIGINAL_COMMAND"
@@ -70,6 +71,7 @@ You are currently in the root directory of the project. You can explore other fi
 /usr/local/bin/gemini-safe \
   -r latest \
   -m "$MODEL" \
+  -y \
   -p "$FULL_PROMPT"
 
 rm "$DIFF_FILE"
