@@ -1,10 +1,12 @@
+# Server-Side Setup Guide (English)
+
 [🇷🇺 Русский](#русский) | [🇬🇧 English](#english)
 
 ---
 
 <a name="english"></a>
 
-# 🇺🇸 Server-Side Setup Guide (English)
+## 🇬🇧 English
 
 This guide will help you transform a basic VPS (even with 1GB RAM) into a secure environment for an AI agent.
 
@@ -112,7 +114,7 @@ Create AI constraint files:
 
 <a name="russian"></a>
 
-# 🇷🇺 Настройка серверной части (Russian)
+## 🇷🇺 Русский
 
 Это руководство поможет вам превратить обычный VPS (даже с 1 ГБ ОЗУ) в защищенную среду для ИИ-агента.
 
