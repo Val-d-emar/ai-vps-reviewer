@@ -1,6 +1,6 @@
 # Server-Side Setup Guide (English)
 
-[🇷🇺 Русский](#русский) | [🇬🇧 English](#english)
+[🇷🇺 Русский](#russian) | [🇬🇧 English](#english)
 
 ---
 
