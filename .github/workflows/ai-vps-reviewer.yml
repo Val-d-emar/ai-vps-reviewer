@@ -2,7 +2,7 @@ name: Gemini AI Code Reviewer
 
 on:
   pull_request:
-    types: [review_requested]
+    types: [review_requested, closed]
 
 jobs:
   review-code:
