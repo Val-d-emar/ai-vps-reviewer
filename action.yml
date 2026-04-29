@@ -1,5 +1,11 @@
 name: "AI VPS Reviewer"
 description: "AI code review via remote VPS"
+author: "Val-d-emar"
+
+branding:
+  icon: "code"
+  color: "blue"
+  
 inputs:
   vps_ssh_key:
     description: "Private SSH key to access VPS"
