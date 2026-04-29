@@ -94,20 +94,25 @@ runs:
       env:
         SSH_KEY: ${{ inputs.vps_ssh_key }}
         SSH_TARGET: ${{ inputs.vps_target }}
+        PR_NUM: ${{ github.event.pull_request.number }}
+        REPO: ${{ github.repository }}
+        LANG_INPUT: ${{ inputs.review_language }}
+        MODEL_INPUT: ${{ inputs.agent_model }}
+        PROMPT_INPUT: ${{ inputs.review_prompt }}        
       run: |
         # 1. SSH Agent
         eval $(ssh-agent -s)
         echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null 2>&1
 
         # 2. Подготовка аргументов
-        PR_NUM="${{ github.event.pull_request.number }}"
-        REPO="${{ github.repository }}"
-        LANG="${{ inputs.review_language }}"
-        PROMPT="${{ inputs.review_prompt }}"
-        MODEL="${{ inputs.agent_model }}"
+        # Кодируем в Base64 все текстовые поля, чтобы пробелы и спецсимволы 
+        # не сломали передачу и не вызвали инъекций
+        LANG_B64=$(echo -n "$LANG_INPUT" | base64 -w 0)
+        MODEL_B64=$(echo -n "$MODEL_INPUT" | base64 -w 0)
+        PROMPT_B64=$(echo -n "$PROMPT_INPUT" | base64 -w 0)
 
         # Используем printf %q для безопасного экранирования всех аргументов для удаленного шелла
-        REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG" "$PROMPT" "$MODEL")
+        REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG_B64" "$MODEL_B64" "$PROMPT_B64")
 
         # 3. Вызов VPS
         cat pr_diff.txt | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
