@@ -1,6 +1,6 @@
 # 🤖 AI VPS Reviewer Action
 
-## [🇷🇺 Русский](#русский) | [🇬🇧 English](#english)
+## [🇷🇺 Русский](#russian) | [🇬🇧 English](#english)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -74,6 +74,8 @@ This project is licensed under the [GNU General Public License v3.0 (GPL-3.0)](L
 ---
 
 ## 🇷🇺 Русский
+
+<a name="russian"></a>
 
 **AI VPS Reviewer** — это GitHub Action для автоматического ревью кода с использованием Google Gemini, работающий на вашем собственном VPS.
 
