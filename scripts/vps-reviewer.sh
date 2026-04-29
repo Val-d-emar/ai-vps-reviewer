@@ -12,7 +12,7 @@ MIN_KB=1048576 # 1 ГБ
 if [ "$FREE_KB" -lt "$MIN_KB" ]; then
     echo "Low disk space! Running emergency cleanup..."
     # Удаляем папки, к которым не обращались больше 7 дней
-    find /home/gemini-user/src -mindepth 2 -maxdepth 3 -type d -atime +7 -exec rm -rf {} +
+    find /home/gemini-user/src -mindepth 2 -maxdepth 3 -type d -mtime +7 -exec rm -rf {} +
 fi
 
 # Удаляем папки, к которым не обращались больше 30 дней
