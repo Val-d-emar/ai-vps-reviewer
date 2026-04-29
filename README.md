@@ -6,7 +6,7 @@
 
 ---
 
-## English
+## 🇬🇧 English
 
 <a name="english"></a>
 
@@ -73,7 +73,7 @@ This project is licensed under the [GNU General Public License v3.0 (GPL-3.0)](L
 
 ---
 
-## Русский
+## 🇷🇺 Русский
 
 **AI VPS Reviewer** — это GitHub Action для автоматического ревью кода с использованием Google Gemini, работающий на вашем собственном VPS.
 
