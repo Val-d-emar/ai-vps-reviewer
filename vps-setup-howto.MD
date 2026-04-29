@@ -4,7 +4,7 @@
 
 ---
 
-<a name="english"></a>
+`<a name="english"></a>`
 
 ## 🇬🇧 English
 
@@ -80,14 +80,13 @@ rm gemini-safe.c
 
 ## 4. Setup the Receiver Script
 
-Create a directory for temporary files and the script itself:
+Create a directory for work files:
 
 ```bash
-mkdir -p ~/src/tmp
-nano ~/vps-reviewer.sh
+mkdir -p ~/src
 ```
 
-Paste the `vps-reviewer.sh` code from your message. Make it executable:
+Copy the `vps-reviewer.sh` code from `scripts` folder. Make it executable:
 
 ```bash
 chmod +x ~/vps-reviewer.sh
@@ -112,7 +111,7 @@ Create AI constraint files:
 
 ---
 
-<a name="russian"></a>
+`<a name="russian"></a>`
 
 ## 🇷🇺 Русский
 
@@ -188,14 +187,13 @@ rm gemini-safe.c
 
 ## 4. Настройка скрипта-приемника
 
-Создайте папку для временных файлов и сам скрипт:
+Создайте папку для рабочих файлов:
 
 ```bash
-mkdir -p ~/src/tmp
-nano ~/vps-reviewer.sh
+mkdir -p ~/src
 ```
 
-Вставьте код скрипта `vps-reviewer.sh` из вашего сообщения. Не забудьте сделать его исполняемым:
+Скопируйте код скрипта `vps-reviewer.sh` из папки `scripts`. Не забудьте сделать его исполняемым:
 
 ```bash
 chmod +x ~/vps-reviewer.sh
@@ -217,7 +215,6 @@ _Это гарантирует, что через этот SSH-ключ можн
 
 1. `/etc/gemini-cli/settings.json` — разрешите только нужные инструменты (`run_shell_command`, `read_file`).
 2. `/etc/gemini-cli/SYSTEM.md` — пропишите системные инструкции, запрещающие доступ к скрытым папкам.
-
 
 ## Лицензия
 
