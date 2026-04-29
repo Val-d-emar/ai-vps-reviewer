@@ -3,17 +3,28 @@
 export TERM=xterm-256color
 export COLORTERM=truecolor
 
-# Парсим аргументы из SSH_ORIGINAL_COMMAND
-eval set -- "$SSH_ORIGINAL_COMMAND"
+# БЕЗОПАСНЫЙ ПАРСИНГ
+# Читаем строку, разделенную пробелами
+read -r PR_NUMBER REPO_NAME USER_LANG MODEL PROMPT_B64 <<< "$SSH_ORIGINAL_COMMAND"
 
-PR_NUMBER=$1
-REPO_NAME=$2
-USER_LANG=$3
-USER_PROMPT=$4
-MODEL=$5
+# Декодируем промпт обратно из Base64
+USER_PROMPT=$(echo "$PROMPT_B64" | base64 -d)
+
+# ВАЛИДАЦИЯ ПУТЕЙ (Защита от Path Traversal)
+# PR_NUMBER должен состоять только из цифр
+if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then
+    echo "Security Error: Invalid PR number format"
+    exit 1
+fi
+
+# REPO_NAME должен быть в формате "owner/repo" (только буквы, цифры, тире, подчеркивания)
+if [[ ! "$REPO_NAME" =~ ^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$ ]]; then
+    echo "Security Error: Invalid Repository name format"
+    exit 1
+fi
 
 # 1. Изолированная папка для PR
-PR_WORKSPACE="/home/gemini-user/workspace/${REPO_NAME}/pr_${PR_NUMBER}"
+PR_WORKSPACE="/home/gemini-user/src/${REPO_NAME}/pr_${PR_NUMBER}"
 mkdir -p "$PR_WORKSPACE"
 cd "$PR_WORKSPACE" || exit 1
 
@@ -26,9 +37,9 @@ fi
 # Скачиваем код. 
 # Если репозиторий приватный, git сам вызовет наш credential.helper (!/usr/local/bin/gh-safe auth git-credential),
 # получит токен бота ai-agent-net из памяти C-обертки и успешно скачает код.
-git fetch --depth 1 origin pull/${PR_NUMBER}/head:pr_branch -q
-
-# Переключаемся на ветку PR
+# Используем +refs/... чтобы принудительно перезаписать локальную ветку, 
+# даже если история коммитов изменилась (force push в PR)
+git fetch --depth 1 origin "+refs/pull/${PR_NUMBER}/head:refs/heads/pr_branch" -q
 git checkout -qf pr_branch
 
 # 3. Сохраняем дифф

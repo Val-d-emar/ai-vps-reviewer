@@ -4,7 +4,7 @@
 
 ---
 
-`<a name="english"></a>`
+<a name="english"></a>
 
 ## 🇬🇧 English
 
@@ -111,7 +111,7 @@ Create AI constraint files:
 
 ---
 
-`<a name="russian"></a>`
+<a name="russian"></a>
 
 ## 🇷🇺 Русский
 
