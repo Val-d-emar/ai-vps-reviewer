@@ -8,7 +8,7 @@
 
 ## 🇬🇧 English
 
-`<a name="english"></a>`
+<a name="english"></a>
 
 **AI VPS Reviewer** is a GitHub Action for automated code review powered by Google Gemini, running on your own remote VPS.
 
@@ -75,7 +75,7 @@ This project is licensed under the [GNU General Public License v3.0 (GPL-3.0)](L
 
 ## 🇷🇺 Русский
 
-`<a name="russian"></a>`
+<a name="russian"></a>
 
 **AI VPS Reviewer** — это GitHub Action для автоматического ревью кода с использованием Google Gemini, работающий на вашем собственном VPS.
 
