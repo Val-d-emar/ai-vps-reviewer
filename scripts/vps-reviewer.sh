@@ -45,8 +45,11 @@ if [ ! -d .git ]; then
     git remote add origin "https://github.com/${REPO_NAME}.git"
 fi
 
-git fetch --depth 1 origin "+refs/pull/${PR_NUMBER}/head:refs/heads/pr_branch" -q
-git checkout -qf pr_branch
+# Скачиваем коммит PR (он автоматически попадает в системный указатель FETCH_HEAD)
+git fetch --depth 1 origin "pull/${PR_NUMBER}/head" -q
+
+# Принудительно переключаем рабочую директорию на скачанный коммит
+git checkout -qf FETCH_HEAD
 
 # 5. Сохраняем дифф
 DIFF_FILE="gemini_diff.diff"
