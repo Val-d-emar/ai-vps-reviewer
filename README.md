@@ -8,7 +8,7 @@
 
 ## 🇬🇧 English
 
-<a name="english"></a>
+`<a name="english"></a>`
 
 **AI VPS Reviewer** is a GitHub Action for automated code review powered by Google Gemini, running on your own remote VPS.
 
@@ -21,16 +21,16 @@
 
 ### Quick Start
 
-1.  Set up your server by following the [**detailed Server Setup Guide (vps-setup-howto.MD)**](vps-setup-howto.MD).
-2.  Add the required secrets to your repository (`VPS_SSH_KEY`, `VPS_TARGET`, `ALLOWED_USERS`).
-3.  Create a workflow file `.github/workflows/my-ai-review.yml`:
+1. Set up your server by following the [**detailed Server Setup Guide (vps-setup-howto.MD)**](vps-setup-howto.MD).
+2. Add the required secrets to your repository (`VPS_SSH_KEY`, `VPS_TARGET`, `ALLOWED_USERS`).
+3. Create a workflow file `.github/workflows/my-ai-review.yml`:
 
 ```yaml
 name: Gemini AI Code Reviewer
 
 on:
   pull_request:
-    types: [review_requested]
+    types: [review_requested, closed]
 
 jobs:
   review-code:
@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Gemini AI Review
-        uses: Val-d-emar/ai-vps-reviewer@v1
+        uses: Val-d-emar/ai-vps-reviewer@v2
         with:
           vps_ssh_key: ${{ secrets.VPS_SSH_KEY }}
           vps_target: ${{ secrets.VPS_TARGET }}
@@ -54,14 +54,14 @@ jobs:
 
 ### Inputs
 
-| Input               | Description                                          | Default   |
-| :------------------ | :--------------------------------------------------- | :-------- |
-| `vps_ssh_key`       | Private SSH key to access your VPS (**required**)    | -         |
-| `vps_target`        | SSH target string like `user@host` (**required**)    | -         |
-| `vps_users`         | Users of the action in the format `user,user2`       | nobody    |
-| `agent_model`       | Gemini model (flash, pro)                            | `flash`   |
-| `review_language`   | Language for the AI response                         | `English` |
-| `approval_required` | If `true`, the agent will Approve or Request Changes | `false`   |
+| Input                 | Description                                               | Default     |
+| :-------------------- | :-------------------------------------------------------- | :---------- |
+| `vps_ssh_key`       | Private SSH key to access your VPS (**required**)   | -           |
+| `vps_target`        | SSH target string like `user@host` (**required**) | -           |
+| `vps_users`         | Users of the action in the format `user,user2`          | nobody      |
+| `agent_model`       | Gemini model (flash, pro)                                 | `flash`   |
+| `review_language`   | Language for the AI response                              | `English` |
+| `approval_required` | If `true`, the agent will Approve or Request Changes    | `false`   |
 
 ### Security Note
 
@@ -75,7 +75,7 @@ This project is licensed under the [GNU General Public License v3.0 (GPL-3.0)](L
 
 ## 🇷🇺 Русский
 
-<a name="russian"></a>
+`<a name="russian"></a>`
 
 **AI VPS Reviewer** — это GitHub Action для автоматического ревью кода с использованием Google Gemini, работающий на вашем собственном VPS.
 
@@ -88,16 +88,16 @@ This project is licensed under the [GNU General Public License v3.0 (GPL-3.0)](L
 
 ### Быстрый старт
 
-1.  Настройте ваш сервер, следуя [**подробному руководству по настройке (vps-setup-howto.MD)**](vps-setup-howto.MD).
-2.  Добавьте необходимые секреты в ваш репозиторий (`VPS_SSH_KEY`, `VPS_TARGET`, `ALLOWED_USERS`).
-3.  Создайте workflow файл `.github/workflows/my-ai-review.yml`:
+1. Настройте ваш сервер, следуя [**подробному руководству по настройке (vps-setup-howto.MD)**](vps-setup-howto.MD).
+2. Добавьте необходимые секреты в ваш репозиторий (`VPS_SSH_KEY`, `VPS_TARGET`, `ALLOWED_USERS`).
+3. Создайте workflow файл `.github/workflows/my-ai-review.yml`:
 
 ```yaml
 name: Gemini AI Code Reviewer
 
 on:
   pull_request:
-    types: [review_requested]
+    types: [review_requested, closed]
 
 jobs:
   review-code:
@@ -110,7 +110,7 @@ jobs:
 
     steps:
       - name: Gemini AI Review
-        uses: Val-d-emar/ai-vps-reviewer@v1
+        uses: Val-d-emar/ai-vps-reviewer@v2
         with:
           vps_ssh_key: ${{ secrets.VPS_SSH_KEY }}
           vps_target: ${{ secrets.VPS_TARGET }}
@@ -121,14 +121,14 @@ jobs:
 
 ### Параметры (Inputs)
 
-| Параметр            | Описание                                                    | По умолчанию |
-| :------------------ | :---------------------------------------------------------- | :----------- |
-| `vps_ssh_key`       | Приватный SSH ключ для доступа к VPS (**обязательно**)      | -            |
-| `vps_target`        | Адрес сервера в формате `user@host` (**обязательно**)       | -            |
-| `vps_users`         | Пользователи акшина в формате `user,user2`                  | никто        |
-| `agent_model`       | Модель Gemini (flash, pro)                                  | `flash`      |
-| `review_language`   | Язык ответа ИИ                                              | `English`    |
-| `approval_required` | Если `true`, агент будет одобрять или запрашивать изменения | `false`      |
+| Параметр      | Описание                                                                                           | По умолчанию |
+| :-------------------- | :--------------------------------------------------------------------------------------------------------- | :---------------------- |
+| `vps_ssh_key`       | Приватный SSH ключ для доступа к VPS (**обязательно**)            | -                       |
+| `vps_target`        | Адрес сервера в формате `user@host` (**обязательно**)               | -                       |
+| `vps_users`         | Пользователи акшина в формате `user,user2`                                     | никто              |
+| `agent_model`       | Модель Gemini (flash, pro)                                                                           | `flash`               |
+| `review_language`   | Язык ответа ИИ                                                                                 | `English`             |
+| `approval_required` | Если `true`, агент будет одобрять или запрашивать изменения | `false`               |
 
 ## Лицензия
 
