@@ -4,6 +4,30 @@ export TERM=xterm-256color
 export COLORTERM=truecolor
 export GIT_PAGER=cat
 
+# --- ПРОВЕРКА МЕСТА НА ДИСКЕ ---
+# Получаем свободное место в КБ
+FREE_KB=$(df /home/gemini-user --output=avail | tail -1)
+MIN_KB=1048576 # 1 ГБ
+
+if [ "$FREE_KB" -lt "$MIN_KB" ]; then
+    echo "Low disk space! Running emergency cleanup..."
+    # Удаляем папки, к которым не обращались больше 7 дней
+    find /home/gemini-user/src -mindepth 2 -maxdepth 3 -type d -atime +7 -exec rm -rf {} +
+fi
+
+# Удаляем папки, к которым не обращались больше 30 дней
+# Зайди под gemini-user: sudo su - gemini-user
+# Открой редактор крон-таблицы: crontab -e
+# # Каждое воскресенье в 03:00 удалять папки в workspace старше 30 дней
+# 0 3 * * 0 find /home/gemini-user/src -mindepth 2 -maxdepth 3 -type d -mtime +30 -exec rm -rf {} +
+
+# Проверяем еще раз
+FREE_KB=$(df /home/gemini-user --output=avail | tail -1)
+if [ "$FREE_KB" -lt "$MIN_KB" ]; then
+    echo "Error: Not enough disk space to proceed."
+    exit 1
+fi
+
 # 1. Читаем аргументы
 read -r PR_NUMBER REPO_NAME LANG_B64 MODEL_B64 PROMPT_B64 <<< "$SSH_ORIGINAL_COMMAND"
 
