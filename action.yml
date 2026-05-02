@@ -155,8 +155,11 @@ runs:
 
         # 3. Вызов VPS
         # cat pr_diff.txt | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
-        (echo "$SECRET_PAYLOAD"; cat pr_diff.txt) | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
-
+        (echo "$SECRET_PAYLOAD"; cat pr_diff.txt) | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" 2>&1 | tee raw_review.md
+        if [ ${PIPESTATUS[1]} -ne 0 ]; then
+          echo "SSH Execution failed"
+          exit 1
+        fi
         ssh-agent -k > /dev/null 2>&1
 
         # 4. Формируем результат
