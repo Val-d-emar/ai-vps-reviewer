@@ -133,27 +133,29 @@ runs:
         PROMPT_B64=$(printf "%s" "$PROMPT_INPUT" | base64 -w 0)
 
         # ЛОГИКА ТОКЕНА:
-        if [ "$IS_DEFAULT_TOKEN" == "true" ]; then
-          if [ -n "$TOKEN_INPUT" ]; then
-            TOKEN_B64=$(printf "%s" "$TOKEN_INPUT" | base64 -w 0)
-          else
-            TOKEN_B64="EMPTY"
-          fi
+        # if [ "$IS_DEFAULT_TOKEN" == "true" ]; then
+        #   if [ -n "$TOKEN_INPUT" ]; then
+        #     TOKEN_B64=$(printf "%s" "$TOKEN_INPUT" | base64 -w 0)
+        #   else
+        #     TOKEN_B64="EMPTY"
+        #   fi
+        # else
+        #   TOKEN_B64="EMPTY"
+        # fi
+
+        if [ "$IS_DEFAULT_TOKEN" == "true" ] && [ -n "$TOKEN_INPUT" ]; then
+          SECRET_PAYLOAD="$TOKEN_INPUT"
         else
-          TOKEN_B64="EMPTY"
+          SECRET_PAYLOAD="EMPTY"
         fi
 
-        echo "LANG_B64: $LANG_B64"
-        echo "MODEL_B64: $MODEL_B64"
-        echo "PROMPT_B64: $PROMPT_B64"
-        echo "TOKEN_B64: $TOKEN_B64"
-        
         # Используем printf %q для безопасного экранирования всех аргументов для удаленного шелла
         # REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG_B64" "$MODEL_B64" "$PROMPT_B64" "$TOKEN_B64")
-        REMOTE_CMD="$PR_NUM $REPO $LANG_B64 $MODEL_B64 $PROMPT_B64 $TOKEN_B64"
+        REMOTE_CMD="$PR_NUM $REPO $LANG_B64 $MODEL_B64 $PROMPT_B64"
 
         # 3. Вызов VPS
-        cat pr_diff.txt | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
+        # cat pr_diff.txt | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
+        (echo "$SECRET_PAYLOAD"; cat pr_diff.txt) | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
 
         ssh-agent -k > /dev/null 2>&1
 
