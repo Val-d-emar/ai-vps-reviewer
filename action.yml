@@ -127,16 +127,19 @@ runs:
         # 2. Подготовка аргументов
         # Кодируем в Base64 все текстовые поля, чтобы пробелы и спецсимволы 
         # не сломали передачу и не вызвали инъекций
-        LANG_B64=$(echo -n "$LANG_INPUT" | base64 -w 0)
-        MODEL_B64=$(echo -n "$MODEL_INPUT" | base64 -w 0)
-        PROMPT_B64=$(echo -n "$PROMPT_INPUT" | base64 -w 0)
+        # Используем printf для надежной передачи строк в base64
+        LANG_B64=$(printf "%s" "$LANG_INPUT" | base64 -w 0)
+        MODEL_B64=$(printf "%s" "$MODEL_INPUT" | base64 -w 0)
+        PROMPT_B64=$(printf "%s" "$PROMPT_INPUT" | base64 -w 0)
 
         # ЛОГИКА ТОКЕНА:
         if [ "$IS_DEFAULT_TOKEN" == "true" ]; then
-          # Аккаунт бота недоступен, пробрасываем токен action-bot на сервер
-          TOKEN_B64=$(echo -n "$TOKEN_INPUT" | base64 -w 0)
+          if [ -n "$TOKEN_INPUT" ]; then
+            TOKEN_B64=$(printf "%s" "$TOKEN_INPUT" | base64 -w 0)
+          else
+            TOKEN_B64="EMPTY"
+          fi
         else
-          # Передан PAT, сервер должен использовать PAT своего бота
           TOKEN_B64="EMPTY"
         fi
 
