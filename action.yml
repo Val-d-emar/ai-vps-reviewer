@@ -143,6 +143,11 @@ runs:
           TOKEN_B64="EMPTY"
         fi
 
+        echo "LANG_B64: $LANG_B64"
+        echo "MODEL_B64: $MODEL_B64"
+        echo "PROMPT_B64: $PROMPT_B64"
+        echo "TOKEN_B64: $TOKEN_B64"
+        
         # Используем printf %q для безопасного экранирования всех аргументов для удаленного шелла
         # REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG_B64" "$MODEL_B64" "$PROMPT_B64" "$TOKEN_B64")
         REMOTE_CMD="$PR_NUM $REPO $LANG_B64 $MODEL_B64 $PROMPT_B64 $TOKEN_B64"
