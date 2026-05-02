@@ -1,0 +1,10 @@
+#!/bin/bash
+# Принудительно указываем путь к Enterprise-настройкам
+export GEMINI_CLI_SYSTEM_SETTINGS_PATH="/etc/gemini-cli/settings.json"
+
+# Указываем путь к кастомному системному промпту
+export GEMINI_SYSTEM_MD="/etc/gemini-cli/SYSTEM.md"
+
+# Запуск оригинального CLI (путь зависит от nvm/npm)
+# /home/gemini-user/.nvm/versions/node/v24.15.0/bin/gemini "$@"
+/home/gemini-user/.nvm/versions/node/v24.15.0/bin/node --max-old-space-size=2048 /home/gemini-user/.nvm/versions/node/v24.15.0/bin/gemini "$@"

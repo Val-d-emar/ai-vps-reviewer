@@ -78,6 +78,8 @@ sudo chmod 710 /usr/local/bin/gemini-safe
 rm gemini-safe.c
 ```
 
+3. Create `gh-safe.c` if you have to run it as well. Use the same way.
+
 ## 4. Setup the Receiver Script
 
 Create a directory for work files:
@@ -166,6 +168,8 @@ npm install -g @google/gemini-cli
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
+    setenv("GEMINI_CLI_SYSTEM_SETTINGS_PATH", "/etc/gemini-cli/settings.json", 1);
+    setenv("GEMINI_SYSTEM_MD", "/etc/gemini-cli/SYSTEM.md", 1);
     setenv("GEMINI_API_KEY", "ВАШ_API_КЛЮЧ_ТУТ", 1);
     execv("/home/gemini-user/.nvm/versions/node/v24.15.0/bin/gemini", argv);
     perror("execv failed");
@@ -184,6 +188,25 @@ sudo chown root:gemini-user /usr/local/bin/gemini-safe
 sudo chmod 710 /usr/local/bin/gemini-safe
 rm gemini-safe.c
 ```
+
+3. Создайте `gh-safe.c` точно так же, если хотите хранить токен бота на сервере
+
+```bash
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    setenv("GH_TOKEN", "ghp_", 1);
+    execv("/usr/bin/gh", argv);
+    perror("execv failed");
+    return 1;
+}
+```
+
+скомпилируйте, присвойте права, пропишите алиас
 
 ## 4. Настройка скрипта-приемника
 

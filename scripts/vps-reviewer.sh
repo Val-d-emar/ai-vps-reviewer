@@ -36,20 +36,17 @@ USER_LANG=$(echo "$LANG_B64" | base64 -d)
 MODEL=$(echo "$MODEL_B64" | base64 -d)
 USER_PROMPT=$(echo "$PROMPT_B64" | base64 -d)
 
+# Первая строка - это токен (или слово EMPTY)
+read -r INCOMING_TOKEN
+
 # ЛОГИКА ТОКЕНА
-if [ "$TOKEN_B64" != "EMPTY" ]; then
-    # Токен action-bot проброшен. Перехватываем управление.
-    CURRENT_TOKEN=$(echo "$TOKEN_B64" | base64 -d)
-    if [[ ! "$CURRENT_TOKEN" =~ ^[0-9]+$ ]]; then
-        echo "Security Error: Invalid Token format"
-        exit 1
-    fi
-    export GH_TOKEN="$CURRENT_TOKEN"
-    # Заставляем git использовать этот токен для текущей сессии
-    export GIT_CONFIG_PARAMETERS="'credential.helper=' 'credential.helper=!f() { echo \"password=$GH_TOKEN\"; }; f'"
+if [ "$INCOMING_TOKEN" != "EMPTY" ]; then
+    export GH_TOKEN="$INCOMING_TOKEN"
+    # Передаем токен через HTTP заголовок Authorization
+    export GIT_CONFIG_PARAMETERS="'http.https://github.com/.extraHeader=AUTHORIZATION: basic $(echo -n "x-access-token:$GH_TOKEN" | base64 -w 0)'"
 fi
-# Если TOKEN_B64 == "EMPTY", переменные не экспортируются, 
-# и система работает через gh-safe.
+# Если TOKEN_B64 == "EMPTY"
+# система работает по старому сценарию (через gh-safe).
 
 # 2. ЖЕСТКАЯ ВАЛИДАЦИЯ (Защита VPS)
 if [[ ! "$PR_NUMBER" =~ ^[0-9]+$ ]]; then

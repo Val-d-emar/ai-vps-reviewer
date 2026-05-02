@@ -1,0 +1,25 @@
+{
+    "security": {
+        "folderTrust": {
+            "enabled": true
+        },
+        "disableYoloMode": false
+    },
+    "tools": {
+        "core": [
+            "ReadFileTool",
+            "GlobTool",
+            "run_shell_command",
+            "read_file",
+            "write_file",
+            "list_dir",
+            "git",
+            "gh",
+            "jq",
+            "rg"
+        ]
+    },
+    "telemetry": {
+        "enabled": false
+    }
+}
