@@ -144,7 +144,8 @@ runs:
         fi
 
         # Используем printf %q для безопасного экранирования всех аргументов для удаленного шелла
-        REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG_B64" "$MODEL_B64" "$PROMPT_B64" "$TOKEN_B64")
+        # REMOTE_CMD=$(printf "%q %q %q %q %q" "$PR_NUM" "$REPO" "$LANG_B64" "$MODEL_B64" "$PROMPT_B64" "$TOKEN_B64")
+        REMOTE_CMD="$PR_NUM $REPO $LANG_B64 $MODEL_B64 $PROMPT_B64 $TOKEN_B64"
 
         # 3. Вызов VPS
         cat pr_diff.txt | ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$REMOTE_CMD" > raw_review.md || { echo "SSH Execution failed"; exit 1; }
