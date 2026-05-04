@@ -61,7 +61,10 @@ runs:
         eval $(ssh-agent -s)
         echo "$SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null 2>&1
         # Если PR закрыт, удаляем папку этого PR
-        ssh -o StrictHostKeyChecking=no $SSH_TARGET "rm -rf ~/src/${{ github.repository }}/pr_${{ github.event.pull_request.number }}"
+        # Передаем специальную команду CLEANUP
+        CLEANUP_CMD="CLEANUP ${{ github.event.pull_request.number }} ${{ github.repository }}"        
+        ssh -o LogLevel=ERROR -o StrictHostKeyChecking=no $SSH_TARGET "$CLEANUP_CMD"        
+        # ssh -o StrictHostKeyChecking=no $SSH_TARGET "rm -rf ~/src/${{ github.repository }}/pr_${{ github.event.pull_request.number }}"
         ssh-agent -k > /dev/null 2>&1
 
     - name: Validate Access
