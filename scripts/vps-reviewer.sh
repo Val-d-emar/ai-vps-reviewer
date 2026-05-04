@@ -28,6 +28,23 @@ if [ "$FREE_KB" -lt "$MIN_KB" ]; then
     exit 1
 fi
 
+# --- ЛОГИКА ОЧИСТКИ ---
+# Если команда начинается с CLEANUP, удаляем папку и выходим
+if [[ "$SSH_ORIGINAL_COMMAND" == CLEANUP* ]]; then
+    read -r CMD PR_NUMBER REPO_NAME <<< "$SSH_ORIGINAL_COMMAND"
+    
+    # Валидация (чтобы не удалили лишнее)
+    if [[ "$PR_NUMBER" =~ ^[0-9]+$ ]] && [[ "$REPO_NAME" =~ ^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$ ]]; then
+        TARGET_DIR="/home/gemini-user/src/${REPO_NAME}/pr_${PR_NUMBER}"
+        if [ -d "$TARGET_DIR" ]; then
+            rm -rf "$TARGET_DIR"
+            echo "Cleanup successful: $TARGET_DIR"
+        fi
+    fi
+    exit 0
+fi
+# --- КОНЕЦ ЛОГИКИ ОЧИСТКИ ---
+
 # 1. Читаем аргументы
 read -r PR_NUMBER REPO_NAME LANG_B64 MODEL_B64 PROMPT_B64 <<< "$SSH_ORIGINAL_COMMAND"
 
